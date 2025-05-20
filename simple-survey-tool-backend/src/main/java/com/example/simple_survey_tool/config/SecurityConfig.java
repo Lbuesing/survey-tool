@@ -24,10 +24,10 @@ public class SecurityConfig {
 
         return http.build();
     }
-     @Bean
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8081","http://survey-frontend:8082"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
         configuration.setAllowCredentials(true);

@@ -79,7 +79,7 @@ public class SurveyController {
             Map<UUID, String> answers = submitAnswersRequest.getAnswers();
 
             // Process each answer and save them
-            saveAnswers(submission, submitAnswersRequest.getSurveyId(), answers);
+            submissionService.saveAnswers(submission, submitAnswersRequest.getSurveyId(), answers);
 
             // Update the survey response count
             surveyService.updateSurvey(surveyService.getSurveyById(submitAnswersRequest.getSurveyId()));
@@ -94,31 +94,7 @@ public class SurveyController {
         }
     }
 
-    /**
-     * Helper method to save answers for each question in the survey.
-     * @param submission - The Submission entity to associate answers with.
-     * @param surveyId - The ID of the survey being submitted.
-     * @param answers - Map of answers, where the key is the question ID and the value is the answer text.
-     */
-    private void saveAnswers(Submission submission, UUID surveyId, Map<UUID, String> answers) {
-        answers.forEach((questionId, answerText) -> {
-            // Retrieve the question associated with the answer
-            Question question = surveyService.getQuestionsBySurveyId(surveyId)
-                .stream()
-                .filter(q -> q.getId().equals(questionId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Question not found"));
-
-            // Create the answer entity and associate it with the submission and question
-            Answer answer = new Answer();
-            answer.setSubmission(submission);
-            answer.setQuestion(question);
-            answer.setAnswer(answerText);
-
-            // Save the answer to the database
-            submissionService.saveResponses(List.of(answer));
-        });
-    }
+    
 
     /**
      * Retrieves the results for a survey.

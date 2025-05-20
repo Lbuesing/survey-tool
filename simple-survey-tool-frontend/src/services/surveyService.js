@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `${process.env.VUE_APP_BACKEND_URL}/api/surveys`;// || 'http://localhost:8080/api/surveys';
+const API_URL = process.env.VUE_APP_BACKEND_URL || 'http://localhost:8080/api/surveys';
 
 export const surveyService = {
   async getSurveyResults(surveyId) {

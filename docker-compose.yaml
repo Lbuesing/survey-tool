@@ -26,11 +26,11 @@ services:
       context: ./simple-survey-tool-frontend
       dockerfile: Dockerfile
       args:
-        VUE_APP_BACKEND_URL: http://survey-backend:8080
+        VUE_APP_BACKEND_URL: "/api/surveys"
     ports:
       - "8082:80"   # Exposes port 80 inside the container to port 8081 on your host
     environment:
-      VUE_APP_BACKEND_URL: http://survey-backend:8080  # Backend URL for the frontend to use
+      VUE_APP_BACKEND_URL: "/api/surveys"  # Backend URL for the frontend to use
     networks:
       - app-network
 
@@ -41,8 +41,6 @@ services:
     build:
       context: ./simple-survey-tool-backend  # Path to your backend directory
       dockerfile: Dockerfile  # Ensure this path is correct
-    # ports:
-    #   - "8080:8080"  # Exposes port 8080 inside the container to port 8080 on your host
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/survey?currentSchema=surveys
       SPRING_DATASOURCE_USERNAME: survey
