@@ -87,6 +87,7 @@ onMounted(async () => {
     survey.value = data;
     questions.value = data.questions;
     surveyLoaded.value = true; // Set surveyLoaded to true once the survey is successfully fetched
+    document.title = 'Survey';
   } catch (error) {
     handleSurveyError(error);
   } finally {

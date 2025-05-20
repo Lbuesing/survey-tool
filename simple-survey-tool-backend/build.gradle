@@ -40,14 +40,3 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-// task buildDocker(type: Docker) {
-//     dependsOn build
-//     docker {
-//         baseImage 'openjdk:17-jdk-slim'
-//         maintainer 'Lukas Büsing <lukas.buesing@posteo.de>'
-//         addFile('build/libs/*.jar', '/app/app.jar')
-//         exposePort 8080
-//         entryPoint 'java', '-jar', '/app/app.jar'
-//     }
-// }
