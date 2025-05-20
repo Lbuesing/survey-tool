@@ -17,63 +17,118 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service layer is where all the business logic lies
+ * Service layer class responsible for business logic related to surveys and their questions.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SurveyService {
+
     private final SurveyRepo surveyRepo;
     private final QuestionRepo questionRepo;
 
-    public List<Survey> getAllSurveys(){
+    /**
+     * Retrieves all surveys from the repository.
+     *
+     * @return List of all surveys.
+     */
+    public List<Survey> getAllSurveys() {
         return surveyRepo.findAll();
     }
 
-    public Survey getSurveyById(UUID id){
+    /**
+     * Fetches a survey by its unique ID.
+     *
+     * @param id UUID of the survey.
+     * @return Survey object if found.
+     * @throws EntityNotFoundException if the survey is not found.
+     */
+    public Survey getSurveyById(UUID id) {
         return surveyRepo.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Survey with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Survey with id " + id + " not found"));
     }
 
+    /**
+     * Saves a new survey and its associated questions.
+     * 
+     * - Assigns default Likert-scale options if none are provided.
+     * - Recreates question objects to ensure proper survey linkage before saving.
+     * - Automatically sets timestamps and response count for the new survey.
+     *
+     * @param survey Survey object to be saved.
+     * @return The saved Survey with updated question references.
+     */
     public Survey saveSurvey(Survey survey) {
-    survey.setCreatedAt(LocalDateTime.now());
-    survey.setUpdatedAt(LocalDateTime.now());
-    survey.setResponse_count(0);
-    Survey savedSurvey = surveyRepo.save(survey);
-    log.info("Survey with id: {} saved successfully", savedSurvey.getId());
+        survey.setCreatedAt(LocalDateTime.now());
+        survey.setUpdatedAt(LocalDateTime.now());
+        survey.setResponse_count(0); // initialize response count
 
-    List<Question> savedQuestions = new ArrayList<>();
-    List<String> defaultLikertScale = List.of(
-        "Totally disagree",
-        "Disagree",
-        "Neutral",
-        "Agree",
-        "Fully Agree"
-    );
+        // Save the survey first to get an ID for linking questions
+        Survey savedSurvey = surveyRepo.save(survey);
+        log.info("Survey with id: {} saved successfully", savedSurvey.getId());
 
-    for (Question question : survey.getQuestions()) {
-        // If responseOptions are null or empty, assign default Likert scale
-        if (question.getResponseOptions() == null || question.getResponseOptions().isEmpty()) {
-            question.setResponseOptions(defaultLikertScale);
+        List<Question> savedQuestions = new ArrayList<>();
+
+        // Define default Likert scale options
+        List<String> defaultLikertScale = List.of(
+                "Totally disagree",
+                "Disagree",
+                "Neutral",
+                "Agree",
+                "Fully Agree"
+        );
+
+        // Save each question and associate it with the saved survey
+        for (Question question : survey.getQuestions()) {
+            // Assign default options if none are provided
+            if (question.getResponseOptions() == null || question.getResponseOptions().isEmpty()) {
+                question.setResponseOptions(defaultLikertScale);
+            }
+
+            // Create a new question instance tied to the saved survey
+            Question newQuestion = new Question(savedSurvey, question.getText());
+            newQuestion.setResponseOptions(question.getResponseOptions());
+
+            // Persist the question
+            Question savedQuestion = questionRepo.save(newQuestion);
+            log.info("Question with id: {} and survey_id: {} saved successfully",
+                    savedQuestion.getId(), savedQuestion.getSurvey_id());
+
+            savedQuestions.add(savedQuestion);
         }
 
-        // Recreate the question to ensure survey_id is correctly set
-        Question newQuestion = new Question(savedSurvey, question.getText());
-        newQuestion.setResponseOptions(question.getResponseOptions()); // preserve/assign options
-        Question savedQuestion = questionRepo.save(newQuestion);
-
-        log.info("Question with id: {} and survey_id: {} saved successfully", 
-                 savedQuestion.getId(), savedQuestion.getSurvey_id());
-
-        savedQuestions.add(savedQuestion);
+        // Link the saved questions to the survey and return the full survey object
+        savedSurvey.setQuestions(savedQuestions);
+        return savedSurvey;
     }
 
-    savedSurvey.setQuestions(savedQuestions);
-    return savedSurvey;
-}
-
-
-    public void deleteSurveyById (UUID id) {
+    /**
+     * Deletes a survey by its unique ID.
+     *
+     * @param id UUID of the survey to be deleted.
+     */
+    public void deleteSurveyById(UUID id) {
         surveyRepo.deleteById(id);
+    }
+
+    /**
+     * Retrieves all questions for a specific survey by ID.
+     *
+     * @param surveyId UUID of the survey.
+     * @return List of questions associated with the survey.
+     */
+    public List<Question> getQuestionsBySurveyId(UUID surveyId) {
+        return questionRepo.findBySurveyIdCustom(surveyId);
+    }
+
+    /**
+     * Increments the response count for a survey and updates its last updated timestamp.
+     *
+     * @param survey The survey object to update.
+     */
+    public void updateSurvey(Survey survey) {
+        survey.setResponse_count(survey.getResponse_count() + 1); // increment response count
+        survey.setUpdatedAt(LocalDateTime.now()); // update timestamp
+        surveyRepo.save(survey);
     }
 }

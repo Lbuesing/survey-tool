@@ -1,17 +1,13 @@
+version: '3.8'
+
 services:
 
   db:
     image: postgres
     restart: always
-    # set shared memory limit when using docker compose
     shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
     volumes:
       - ./data:/var/lib/postgresql/data
-    #  - type: tmpfs
-    #    target: /dev/shm
-    #    tmpfs:
-    #      size: 134217728 # 128*2^20 bytes = 128Mb
     environment:
       POSTGRES_USER: survey
       POSTGRES_PASSWORD: survey
@@ -19,3 +15,42 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - 5433:5432
+    networks:
+      - app-network
+
+  survey-frontend:
+    depends_on:
+      survey-backend:
+        condition: service_started
+    build:
+      context: ./simple-survey-tool-frontend
+      dockerfile: Dockerfile
+      args:
+        VUE_APP_BACKEND_URL: http://survey-backend:8080
+    ports:
+      - "8082:80"   # Exposes port 80 inside the container to port 8081 on your host
+    environment:
+      VUE_APP_BACKEND_URL: http://survey-backend:8080  # Backend URL for the frontend to use
+    networks:
+      - app-network
+
+  survey-backend:
+    depends_on:
+      db:
+        condition: service_started
+    build:
+      context: ./simple-survey-tool-backend  # Path to your backend directory
+      dockerfile: Dockerfile  # Ensure this path is correct
+    # ports:
+    #   - "8080:8080"  # Exposes port 8080 inside the container to port 8080 on your host
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/survey?currentSchema=surveys
+      SPRING_DATASOURCE_USERNAME: survey
+      SPRING_DATASOURCE_PASSWORD: survey
+      SPRING_PROFILES_ACTIVE: docker  # Optional: If you have a 'docker' profile for Spring
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	compileOnly 'org.projectlombok:lombok'
@@ -39,3 +40,14 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// task buildDocker(type: Docker) {
+//     dependsOn build
+//     docker {
+//         baseImage 'openjdk:17-jdk-slim'
+//         maintainer 'Lukas Büsing <lukas.buesing@posteo.de>'
+//         addFile('build/libs/*.jar', '/app/app.jar')
+//         exposePort 8080
+//         entryPoint 'java', '-jar', '/app/app.jar'
+//     }
+// }

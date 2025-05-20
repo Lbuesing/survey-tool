@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/survey?currentSchema=surveys
+    username: survey
+    password: survey
+  driverClassName: org.postgresql.Driver
+  flyway:
+    locations: classpath:/db/migration
+    schemas: surveys
+    baselineOnMigrate: true
+    enabled: true

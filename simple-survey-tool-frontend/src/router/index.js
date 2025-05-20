@@ -2,9 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/survey/:id',
-    name: 'Survey',
-    component: () => import('../App.vue')
+    path: '/surveys/:id',
+    name: 'SurveyView',
+    component: () => import('../views/SurveyView.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*', // Catch-all for undefined routes
+    name: 'NotFound',
+    component: () => import('../views/NotFound.vue') // You'll need to create this file
   }
 ]
 

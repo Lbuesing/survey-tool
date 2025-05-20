@@ -27,9 +27,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "survey_id")
-    // private Survey survey;
+
     @JsonProperty("survey_id")
     private UUID survey_id;
     @JsonProperty("text")
