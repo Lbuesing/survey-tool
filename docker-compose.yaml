@@ -46,6 +46,9 @@ services:
       SPRING_DATASOURCE_USERNAME: survey
       SPRING_DATASOURCE_PASSWORD: survey
       SPRING_PROFILES_ACTIVE: docker  # Optional: If you have a 'docker' profile for Spring
+      MANAGEMENT_METRICS_ENABLE_SYSTEM: false
+      CORS_ALLOWED_ORIGINS: http://localhost:8081,http://survey-frontend:8082
+
     networks:
       - app-network
 

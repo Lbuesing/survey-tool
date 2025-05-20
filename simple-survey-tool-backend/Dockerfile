@@ -1,5 +1,5 @@
-# Use OpenJDK base image
-FROM openjdk:17-jdk-slim AS build
+# Use eclipse-temurin base image. This image works at least on wsl2 and raspbian
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set working directory
 WORKDIR /app
