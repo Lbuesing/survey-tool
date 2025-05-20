@@ -17,7 +17,6 @@ services:
       - 5433:5432
     networks:
       - app-network
-
   survey-frontend:
     depends_on:
       survey-backend:
@@ -33,7 +32,7 @@ services:
       VUE_APP_BACKEND_URL: "/api/surveys"  # Backend URL for the frontend to use
     networks:
       - app-network
-
+    restart: unless-stopped
   survey-backend:
     depends_on:
       db:
@@ -46,11 +45,11 @@ services:
       SPRING_DATASOURCE_USERNAME: survey
       SPRING_DATASOURCE_PASSWORD: survey
       SPRING_PROFILES_ACTIVE: docker  # Optional: If you have a 'docker' profile for Spring
-      MANAGEMENT_METRICS_ENABLE_SYSTEM: false
       CORS_ALLOWED_ORIGINS: http://localhost:8081,http://survey-frontend:8082
 
     networks:
       - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
