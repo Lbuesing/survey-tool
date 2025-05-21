@@ -26,8 +26,6 @@ public class SubmissionService {
     private final AnswerRepo answerRepo;
     private final SurveyService surveyService;
 
-
-
     /**
      * Creates a new submission record for a given survey.
      *
@@ -56,7 +54,6 @@ public class SubmissionService {
         answerRepo.saveAll(answers);
     }
 
-
     /**
      * Helper method to save answers for each question in the survey.
      * @param submission - The Submission entity to associate answers with.
@@ -83,6 +80,7 @@ public class SubmissionService {
             saveResponses(List.of(answer));
         });
     }
+
     /**
      * Retrieves all answers associated with a given survey ID.
      *
